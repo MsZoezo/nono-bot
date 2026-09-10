@@ -1,4 +1,3 @@
-// Package bot creates functions used by discordgo.
 package bot
 
 import (
