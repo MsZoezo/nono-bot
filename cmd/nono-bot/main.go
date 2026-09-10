@@ -1,8 +1,10 @@
-// binary nono-bot
+// binary nono-bot.
 package main
 
-import "fmt"
+import (
+	"github.com/MsZoezo/nono-bot/internal/cli"
+)
 
 func main() {
-	fmt.Println("Hello world!")
+	cli.Execute()
 }
