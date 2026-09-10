@@ -1,0 +1,4 @@
+[general]
+# Format: "Bot xxxxxx"
+token = "Bot [token]"
+guild = 1234567890123456789

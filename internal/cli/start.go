@@ -9,18 +9,21 @@ import (
 	"github.com/MsZoezo/nono-bot/internal/bot"
 	"github.com/bwmarrin/discordgo"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var startCmd = &cobra.Command{
 	Use:   "start [token]",
 	Short: "Start nono bot",
-	Run: func(_ *cobra.Command, args []string) {
-		if len(args) == 0 {
-			fmt.Println("Missing token argument, aborting.")
+	Run: func(_ *cobra.Command, _ []string) {
+		token := viper.GetString("general.token")
+
+		if len(token) == 0 {
+			fmt.Println("Missing token in config, aborting.")
 			return
 		}
 
-		dg, err := discordgo.New("Bot " + args[0])
+		dg, err := discordgo.New(token)
 
 		if err != nil {
 			fmt.Println("Error creating discord session, aborting.")
