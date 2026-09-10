@@ -1,0 +1,15 @@
+[tools]
+go = "latest"
+"go:github.com/mgechev/revive" = "latest"
+
+[tasks.dev]
+description = "Compile and run nono bot"
+run = "go run ./cmd/nono-bot"
+
+[tasks.build]
+description = "Compile nono bot"
+run = "go build -o out/ ./cmd/nono-bot"
+
+[tasks.lint]
+description = "Lint nono bot"
+run = "revive -config revive.toml -formatter stylish ./..."
