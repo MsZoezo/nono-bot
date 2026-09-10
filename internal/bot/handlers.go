@@ -2,6 +2,7 @@ package bot
 
 import (
 	"fmt"
+	"time"
 
 	"charm.land/log/v2"
 	"github.com/MsZoezo/nono-bot/internal/text"
@@ -18,17 +19,26 @@ func MessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	start := time.Now()
+
 	found := text.ContainsBadWords(bannedWords, m.Content)
 
 	if len(found) == 0 {
 		return
 	}
 
-	log.Debug("Filtered out bad words!", "user", m.Author.DisplayName(), "words", found)
-
 	s.ChannelMessageDelete(m.ChannelID, m.Message.ID)
+	msg, _ := s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%s, how could you say such a bad word?!", m.Author.Mention()))
 
-	s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%s, how could you say such a bad word?!", m.Author.Mention()))
+	end := time.Now()
+
+	elapsed := end.Sub(start)
+
+	log.Debug("Filtered out bad words!", "user", m.Author.DisplayName(), "Elapsed (ms)", elapsed.Milliseconds(), "words", found)
+
+	time.Sleep(5 * time.Second)
+
+	s.ChannelMessageDelete(msg.ChannelID, msg.ID)
 }
 
 // ConnectHandler handles state after connecting to discord.
