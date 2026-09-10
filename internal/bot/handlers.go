@@ -1,9 +1,16 @@
 package bot
 
 import (
+	"fmt"
+
 	"charm.land/log/v2"
+	"github.com/MsZoezo/nono-bot/internal/text"
 	"github.com/bwmarrin/discordgo"
 )
+
+var bannedWords = map[string]bool{
+	"pickle": true,
+}
 
 // MessageCreateHandler handles received messages from channels.
 func MessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -11,11 +18,17 @@ func MessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	log.Debug("Received new message.", "User", m.Author.Username)
+	found := text.ContainsBadWords(bannedWords, m.Content)
 
-	if m.Content == "ping" {
-		s.ChannelMessageSend(m.ChannelID, "Pong!")
+	if len(found) == 0 {
+		return
 	}
+
+	log.Debug("Filtered out bad words!", "user", m.Author.DisplayName(), "words", found)
+
+	s.ChannelMessageDelete(m.ChannelID, m.Message.ID)
+
+	s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%s, how could you say such a bad word?!", m.Author.Mention()))
 }
 
 // ConnectHandler handles state after connecting to discord.
