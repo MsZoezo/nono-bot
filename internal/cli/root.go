@@ -3,9 +3,8 @@ package cli
 
 import (
 	"errors"
-	"fmt"
-	"os"
 
+	"charm.land/log/v2"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -17,6 +16,8 @@ var rootCmd = &cobra.Command{
 	Short: "Nono bot is a discord bot written in go",
 	Long:  "Nono bot is a go discord bot designed to keep nono words out of your server.",
 	PersistentPreRun: func(_ *cobra.Command, _ []string) {
+		log.Default().SetLevel(log.DebugLevel)
+
 		viper.SetConfigName("config")
 
 		viper.AddConfigPath("$home/.config/nono-bot/")
@@ -26,20 +27,19 @@ var rootCmd = &cobra.Command{
 
 		if err != nil {
 			if errors.As(err, &configFileNotFoundError) {
-				fmt.Println("Config file not found, consider creating one.")
-			} else {
-				fmt.Println("Error reading config file, aborting")
+				log.Fatal("Config file not found, consider creating one.")
 			}
 
-			os.Exit(1)
+			log.Fatal("Error reading config file..")
 		}
+
+		log.Debug("Succesfully read config file.")
 	},
 }
 
 // Execute the cli program.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		log.Fatal(err.Error())
 	}
 }
