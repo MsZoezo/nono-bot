@@ -27,6 +27,8 @@ var startCmd = &cobra.Command{
 			return
 		}
 
+		dg.Identify.Intents = discordgo.IntentGuildMessages
+
 		dg.AddHandler(bot.MessageCreateHandler)
 
 		err = dg.Open()
