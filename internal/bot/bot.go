@@ -24,7 +24,7 @@ func New(token string) (*Bot, error) {
 
 	dg.Identify.Intents = discordgo.IntentGuildMessages
 
-	dg.AddHandler(MessageCreateHandler)
+	dg.AddHandler(CreateMessageCreateHandler())
 	dg.AddHandler(ConnectHandler)
 	dg.AddHandler(DisconnectHandler)
 
