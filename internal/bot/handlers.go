@@ -9,10 +9,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-var bannedWords = map[string]bool{
-	"pickle": true,
-}
-
 // MessageCreateHandler handles received messages from channels.
 func MessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID {
@@ -21,7 +17,7 @@ func MessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	start := time.Now()
 
-	found := text.ContainsBadWords(bannedWords, m.Content)
+	found := text.ContainsBadWords(text.ArrToFilter([]string{"pickle"}), m.Content)
 
 	if len(found) == 0 {
 		return

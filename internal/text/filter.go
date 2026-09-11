@@ -5,6 +5,20 @@ import (
 	"strings"
 )
 
+// Filter defines with type we expect for our filters.
+type Filter = map[string]interface{}
+
+// ArrToFilter turns a simple array of strings into a filter we can work with.
+func ArrToFilter(arr []string) Filter {
+	filter := make(Filter)
+
+	for _, item := range arr {
+		filter[item] = struct{}{}
+	}
+
+	return filter
+}
+
 func normalize(s string) string {
 	return strings.Map(func(r rune) rune {
 		switch r {
@@ -25,7 +39,7 @@ func normalize(s string) string {
 }
 
 // ContainsBadWords checks if a string contains any bad words from a filter array and returns the found bad words with count.
-func ContainsBadWords(filter map[string]bool, message string) map[string]int {
+func ContainsBadWords(filter Filter, message string) map[string]int {
 	found := make(map[string]int)
 
 	words := strings.Fields(strings.ToLower(message))
@@ -33,7 +47,7 @@ func ContainsBadWords(filter map[string]bool, message string) map[string]int {
 	for _, word := range words {
 		word = normalize(strings.Trim(word, ".,!?;:\"'"))
 
-		if filter[word] {
+		if _, exists := filter[word]; exists {
 			found[word]++
 		}
 	}
