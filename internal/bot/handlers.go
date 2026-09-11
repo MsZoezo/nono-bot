@@ -1,7 +1,9 @@
 package bot
 
 import (
+	"crypto/rand"
 	"fmt"
+	"math/big"
 	"time"
 
 	"charm.land/log/v2"
@@ -12,7 +14,6 @@ import (
 
 // CreateMessageCreateHandler creates the function that handles received messages from channels.
 func CreateMessageCreateHandler() func(s *discordgo.Session, m *discordgo.MessageCreate) {
-
 	words := viper.GetStringSlice("filter.default")
 
 	var filter text.Filter
@@ -21,6 +22,12 @@ func CreateMessageCreateHandler() func(s *discordgo.Session, m *discordgo.Messag
 		filter = text.ArrToFilter(words)
 	} else {
 		log.Info("No default filter list found in config.")
+	}
+
+	responses := viper.GetStringSlice("filter.responses")
+
+	if len(responses) == 0 {
+		log.Fatal("No responses found in config..")
 	}
 
 	return func(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -41,7 +48,12 @@ func CreateMessageCreateHandler() func(s *discordgo.Session, m *discordgo.Messag
 		}
 
 		s.ChannelMessageDelete(m.ChannelID, m.Message.ID)
-		msg, _ := s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%s, how could you say such a bad word?!", m.Author.Mention()))
+
+		random, _ := rand.Int(rand.Reader, big.NewInt(int64(len(responses))))
+
+		response := responses[random.Int64()]
+
+		msg, _ := s.ChannelMessageSend(m.ChannelID, fmt.Sprintf(response, m.Author.Mention()))
 
 		end := time.Now()
 
