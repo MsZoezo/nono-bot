@@ -39,8 +39,8 @@ func normalize(s string) string {
 }
 
 // ContainsBadWords checks if a string contains any bad words from a filter array and returns the found bad words with count.
-func ContainsBadWords(filter Filter, message string) map[string]int {
-	found := make(map[string]int)
+func ContainsBadWords(filter Filter, message string) map[string]uint64 {
+	found := make(map[string]uint64)
 
 	words := strings.Fields(strings.ToLower(message))
 

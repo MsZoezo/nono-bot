@@ -1,13 +1,16 @@
 // Package commands contains every command for our discord bot
 package commands
 
-import "github.com/bwmarrin/discordgo"
+import (
+	"github.com/MsZoezo/nono-bot/internal/db"
+	"github.com/bwmarrin/discordgo"
+)
 
 // Ping command
 type Ping struct{}
 
 // Run the ping command
-func (ping Ping) Run(s *discordgo.Session, i *discordgo.InteractionCreate) error {
+func (ping Ping) Run(_ *db.Database, s *discordgo.Session, i *discordgo.InteractionCreate) error {
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{

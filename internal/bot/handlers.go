@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"charm.land/log/v2"
+	"github.com/MsZoezo/nono-bot/internal/db"
 	"github.com/MsZoezo/nono-bot/internal/text"
 	"github.com/bwmarrin/discordgo"
 	"github.com/spf13/viper"
@@ -13,6 +14,12 @@ import (
 
 // CreateMessageCreateHandler creates the function that handles received messages from channels.
 func CreateMessageCreateHandler() func(s *discordgo.Session, m *discordgo.MessageCreate) {
+	db, err := db.New()
+
+	if err != nil {
+		log.Fatal("Unable to connect to database..")
+	}
+
 	words := viper.GetStringSlice("filter.default")
 
 	var filter text.Filter
@@ -57,6 +64,10 @@ func CreateMessageCreateHandler() func(s *discordgo.Session, m *discordgo.Messag
 		end := time.Now()
 
 		elapsed := end.Sub(start)
+
+		for word, count := range found {
+			go db.UpsertNonoWord(m.GuildID, m.Author.ID, word, count)
+		}
 
 		log.Debug("Filtered out bad words!", "user", m.Author.DisplayName(), "Elapsed (ms)", elapsed.Milliseconds(), "words", found)
 

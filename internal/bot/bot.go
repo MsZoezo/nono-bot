@@ -30,10 +30,11 @@ func New(token string) (*Bot, error) {
 
 	log.Debug("Succesfully created discord session.")
 
-	dg.Identify.Intents = discordgo.IntentGuildMessages
+	dg.Identify.Intents = discordgo.IntentGuildMessages | discordgo.IntentGuilds
 
-	registry := registry.New(
+	registry, _ := registry.New(
 		commands.Ping{},
+		commands.Offenders{},
 	)
 
 	dg.AddHandler(CreateMessageCreateHandler())
