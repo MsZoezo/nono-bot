@@ -9,9 +9,9 @@ import (
 	"github.com/spf13/viper"
 )
 
-var startCmd = &cobra.Command{
-	Use:   "start [token]",
-	Short: "Start nono bot",
+var registerCmd = &cobra.Command{
+	Use:   "register",
+	Short: "Register slash commands with discord",
 	Run: func(_ *cobra.Command, _ []string) {
 		token := viper.GetString("general.token")
 
@@ -26,16 +26,16 @@ var startCmd = &cobra.Command{
 			log.Fatal("Bot couldn't initalize..")
 		}
 
-		err = bot.Run()
+		guildID := viper.GetString("guildID")
+
+		err = bot.RegisterCommands(guildID)
 
 		if err != nil {
-			log.Fatal("Error while running bot..")
+			log.Fatal("Couldn't register commands")
 		}
-
-		bot.Close()
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(startCmd)
+	rootCmd.AddCommand(registerCmd)
 }

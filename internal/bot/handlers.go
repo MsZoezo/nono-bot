@@ -1,9 +1,8 @@
 package bot
 
 import (
-	"crypto/rand"
 	"fmt"
-	"math/big"
+	"math/rand/v2"
 	"time"
 
 	"charm.land/log/v2"
@@ -49,9 +48,9 @@ func CreateMessageCreateHandler() func(s *discordgo.Session, m *discordgo.Messag
 
 		s.ChannelMessageDelete(m.ChannelID, m.Message.ID)
 
-		random, _ := rand.Int(rand.Reader, big.NewInt(int64(len(responses))))
+		random := rand.IntN(len(responses))
 
-		response := responses[random.Int64()]
+		response := responses[random]
 
 		msg, _ := s.ChannelMessageSend(m.ChannelID, fmt.Sprintf(response, m.Author.Mention()))
 
