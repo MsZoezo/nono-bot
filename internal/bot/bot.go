@@ -37,6 +37,7 @@ func New(db *db.Database, token string) (*Bot, error) {
 	registry, _ := registry.New(
 		commands.Ping{},
 		commands.Offenders{Db: db},
+		commands.Words{Db: db},
 	)
 
 	filter := handlers.NewFilter(db)

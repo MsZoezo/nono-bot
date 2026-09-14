@@ -62,7 +62,30 @@ func (database *Database) GetTopOffenders(guildID string) ([]OffenderStat, error
 	err := gorm.G[models.NonoCount](database.db).
 		Select("user_id, sum(count) AS total").
 		Where("guild_id = ?", guildID).
-		Group("user_id").Order("total DESC").Limit(10).Scan(ctx, &results)
+		Group("user_id").Order("total DESC").
+		Limit(10).
+		Scan(ctx, &results)
+
+	return results, err
+}
+
+// WordStat is the data returned when we select the top words.
+type WordStat struct {
+	Word  string `gorm:"column:word"`
+	Total uint64 `gorm:"column:total"`
+}
+
+// GetTopWordsGuild returns the top words for a given guild.
+func (database *Database) GetTopWordsGuild(guildID string) ([]WordStat, error) {
+	var results []WordStat
+
+	err := gorm.G[models.NonoCount](database.db).
+		Select("word, sum(count) AS total").
+		Where("guild_id = ?", guildID).
+		Group("word").
+		Order("total DESC").
+		Limit(10).
+		Scan(ctx, &results)
 
 	return results, err
 }

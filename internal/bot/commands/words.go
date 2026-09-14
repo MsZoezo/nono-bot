@@ -9,14 +9,14 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-// Offenders command
-type Offenders struct {
+// Words command
+type Words struct {
 	Db *db.Database
 }
 
-// Run the offenders command
-func (o Offenders) Run(s *discordgo.Session, i *discordgo.InteractionCreate) error {
-	offenders, err := o.Db.GetTopOffenders(i.GuildID)
+// Run the words command
+func (w Words) Run(s *discordgo.Session, i *discordgo.InteractionCreate) error {
+	words, err := w.Db.GetTopWordsGuild(i.GuildID)
 
 	if err != nil {
 		log.Error("Error getting top words.")
@@ -25,11 +25,8 @@ func (o Offenders) Run(s *discordgo.Session, i *discordgo.InteractionCreate) err
 
 	var sb strings.Builder
 
-	sb.WriteString("Top offenders:\n")
-
-	for i, o := range offenders {
-		user, _ := s.User(o.UserID)
-		sb.WriteString(fmt.Sprintf("%d. %s — %d\n", i+1, user.DisplayName(), o.Total))
+	for i, o := range words {
+		sb.WriteString(fmt.Sprintf("%d. %s — %d\n", i+1, o.Word, o.Total))
 	}
 
 	guild, _ := s.Guild(i.GuildID)
@@ -39,7 +36,7 @@ func (o Offenders) Run(s *discordgo.Session, i *discordgo.InteractionCreate) err
 		Data: &discordgo.InteractionResponseData{
 			Embeds: []*discordgo.MessageEmbed{
 				{
-					Title:       fmt.Sprintf("Top offenders - %s", guild.Name),
+					Title:       fmt.Sprintf("Top words - %s", guild.Name),
 					Description: sb.String(),
 					Color:       i.Member.User.AccentColor,
 				},
@@ -50,10 +47,10 @@ func (o Offenders) Run(s *discordgo.Session, i *discordgo.InteractionCreate) err
 	return nil
 }
 
-// Definition of offenders command
-func (Offenders) Definition() *discordgo.ApplicationCommand {
+// Definition of words command
+func (Words) Definition() *discordgo.ApplicationCommand {
 	return &discordgo.ApplicationCommand{
-		Name:        "offenders",
-		Description: "Get top offender!",
+		Name:        "words",
+		Description: "Get top words!",
 	}
 }

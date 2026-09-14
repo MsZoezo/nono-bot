@@ -2,6 +2,9 @@
 package registry
 
 import (
+	"time"
+
+	"charm.land/log/v2"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -36,7 +39,17 @@ func New(commands ...Command) (registry *Registry, err error) {
 
 // OnCommand handles incoming interactions and runs the corresponding command.
 func (registry *Registry) OnCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	if i.Type != discordgo.InteractionApplicationCommand {
+		return
+	}
+
 	if cmd, ok := registry.commands[i.ApplicationCommandData().Name]; ok {
+		start := time.Now()
 		cmd.Run(s, i)
+		elapsed := time.Since(start)
+
+		log.Debug("Succesfully ran command", "cmd", i.ApplicationCommandData().Name, "Elapsed (ms)", elapsed.Milliseconds())
+	} else {
+		log.Error("Received unknown command, unable to handle it..")
 	}
 }
