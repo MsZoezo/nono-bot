@@ -2,15 +2,12 @@
 package registry
 
 import (
-	"github.com/MsZoezo/nono-bot/internal/db"
 	"github.com/bwmarrin/discordgo"
 )
 
 // Registry for our commands
 type Registry struct {
 	commands map[string]Command
-
-	db *db.Database
 }
 
 // RegisterCommands registers all commands in the register
@@ -34,20 +31,12 @@ func New(commands ...Command) (registry *Registry, err error) {
 		registry.commands[command.Definition().Name] = command
 	}
 
-	db, err := db.New()
-
-	if err != nil {
-		return
-	}
-
-	registry.db = db
-
 	return
 }
 
 // OnCommand handles incoming interactions and runs the corresponding command.
 func (registry *Registry) OnCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if cmd, ok := registry.commands[i.ApplicationCommandData().Name]; ok {
-		cmd.Run(registry.db, s, i)
+		cmd.Run(s, i)
 	}
 }

@@ -20,7 +20,7 @@ var registerCmd = &cobra.Command{
 			return
 		}
 
-		bot, err := bot.New(token)
+		bot, err := bot.New(nil, token)
 
 		if err != nil {
 			log.Fatal("Bot couldn't initalize..")

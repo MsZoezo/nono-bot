@@ -10,12 +10,14 @@ import (
 )
 
 // Offenders command
-type Offenders struct{}
+type Offenders struct {
+	Db *db.Database
+}
 
 // Run the offenders command
-func (Offenders) Run(db *db.Database, s *discordgo.Session, i *discordgo.InteractionCreate) error {
+func (o Offenders) Run(s *discordgo.Session, i *discordgo.InteractionCreate) error {
 
-	offenders, err := db.GetTopOffenders(i.GuildID)
+	offenders, err := o.Db.GetTopOffenders(i.GuildID)
 
 	if err != nil {
 		log.Error("Error getting top offenders.")

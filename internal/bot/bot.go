@@ -8,7 +8,9 @@ import (
 
 	"charm.land/log/v2"
 	"github.com/MsZoezo/nono-bot/internal/bot/commands"
+	"github.com/MsZoezo/nono-bot/internal/bot/handlers"
 	"github.com/MsZoezo/nono-bot/internal/bot/registry"
+	"github.com/MsZoezo/nono-bot/internal/db"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -20,7 +22,7 @@ type Bot struct {
 }
 
 // New creates an instance of the bot with provided token.
-func New(token string) (*Bot, error) {
+func New(db *db.Database, token string) (*Bot, error) {
 	dg, err := discordgo.New(token)
 
 	if err != nil {
@@ -34,12 +36,14 @@ func New(token string) (*Bot, error) {
 
 	registry, _ := registry.New(
 		commands.Ping{},
-		commands.Offenders{},
+		commands.Offenders{Db: db},
 	)
 
-	dg.AddHandler(CreateMessageCreateHandler())
-	dg.AddHandler(ConnectHandler)
-	dg.AddHandler(DisconnectHandler)
+	filter := handlers.NewFilter(db)
+
+	dg.AddHandler(filter.Handler)
+	dg.AddHandler(handlers.ConnectHandler)
+	dg.AddHandler(handlers.DisconnectHandler)
 	dg.AddHandler(registry.OnCommand)
 
 	return &Bot{dg, registry}, nil
