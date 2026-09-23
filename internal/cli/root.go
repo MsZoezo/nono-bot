@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"charm.land/log/v2"
+	"github.com/charmbracelet/colorprofile"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -17,6 +18,7 @@ var rootCmd = &cobra.Command{
 	Long:  "Nono bot is a go discord bot designed to keep nono words out of your server.",
 	PersistentPreRun: func(_ *cobra.Command, _ []string) {
 		log.Default().SetLevel(log.DebugLevel)
+		log.Default().SetColorProfile(colorprofile.ANSI)
 
 		viper.SetConfigName("config")
 

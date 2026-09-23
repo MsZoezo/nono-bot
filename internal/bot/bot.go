@@ -38,6 +38,7 @@ func New(db *db.Database, token string) (*Bot, error) {
 		commands.Ping{},
 		commands.Offenders{Db: db},
 		commands.Words{Db: db},
+		commands.User{Db: db},
 	)
 
 	filter := handlers.NewFilter(db)

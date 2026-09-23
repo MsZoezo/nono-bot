@@ -31,6 +31,7 @@ var registerCmd = &cobra.Command{
 		err = bot.RegisterCommands(guildID)
 
 		if err != nil {
+			log.Debug(err)
 			log.Fatal("Couldn't register commands")
 		}
 	},

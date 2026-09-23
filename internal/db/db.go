@@ -89,3 +89,16 @@ func (database *Database) GetTopWordsGuild(guildID string) ([]WordStat, error) {
 
 	return results, err
 }
+
+// GetUserWords returns nono words said by a user
+func (database *Database) GetUserWords(userID string) ([]WordStat, error) {
+	var results []WordStat
+
+	err := gorm.G[models.NonoCount](database.db).
+		Select("word, count AS total").
+		Where("user_id = ?", userID).
+		Order("total DESC").
+		Scan(ctx, &results)
+
+	return results, err
+}
