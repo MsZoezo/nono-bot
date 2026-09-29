@@ -3,9 +3,11 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/MsZoezo/nono-bot/internal/db/models"
+	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -20,7 +22,12 @@ type Database struct {
 
 // New database instance
 func New() (*Database, error) {
-	db, err := gorm.Open(postgres.Open("host=db user=nonobot password=develop dbname=nonodata port=5432 sslmode=disable"), &gorm.Config{})
+	host := viper.GetString("database.host")
+	user := viper.GetString("database.user")
+	password := viper.GetString("database.password")
+	dbname := viper.GetString("database.dbname")
+
+	db, err := gorm.Open(postgres.Open(fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=5432 sslmode=disable", host, user, password, dbname)), &gorm.Config{})
 
 	if err != nil {
 		return nil, err
