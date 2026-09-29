@@ -20,7 +20,7 @@ type Database struct {
 
 // New database instance
 func New() (*Database, error) {
-	db, err := gorm.Open(postgres.Open("host=localhost user=nonobot password=develop dbname=nonodata port=5432 sslmode=disable"), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open("host=db user=nonobot password=develop dbname=nonodata port=5432 sslmode=disable"), &gorm.Config{})
 
 	if err != nil {
 		return nil, err

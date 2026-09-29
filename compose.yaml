@@ -12,5 +12,16 @@ services:
     volumes: 
       - db-data:/var/lib/postgresql
 
+  bot:
+    build: .
+    container_name: nonobot
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_started
+    # environment:
+    volumes:
+      - ./config.toml:/config.toml:ro,Z
+
 volumes:
   db-data:
