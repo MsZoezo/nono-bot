@@ -25,11 +25,9 @@ func (o Offenders) Run(s *discordgo.Session, i *discordgo.InteractionCreate) err
 
 	var sb strings.Builder
 
-	sb.WriteString("Top offenders:\n")
-
-	for i, o := range offenders {
-		user, _ := s.User(o.UserID)
-		sb.WriteString(fmt.Sprintf("%d. %s — %d\n", i+1, user.DisplayName(), o.Total))
+	for idx, o := range offenders {
+		member, _ := s.GuildMember(i.GuildID, o.UserID)
+		sb.WriteString(fmt.Sprintf("%d. **%s** → %d\n", idx+1, member.Nick, o.Total))
 	}
 
 	guild, _ := s.Guild(i.GuildID)
@@ -39,9 +37,14 @@ func (o Offenders) Run(s *discordgo.Session, i *discordgo.InteractionCreate) err
 		Data: &discordgo.InteractionResponseData{
 			Embeds: []*discordgo.MessageEmbed{
 				{
-					Title:       fmt.Sprintf("Top offenders - %s", guild.Name),
-					Description: sb.String(),
-					Color:       i.Member.User.AccentColor,
+					Title: fmt.Sprintf("Inspecting %s", guild.Name),
+					Fields: []*discordgo.MessageEmbedField{
+						{
+							Name:  "Top offenders",
+							Value: sb.String(),
+						},
+					},
+					Color: i.Member.User.AccentColor,
 				},
 			},
 		},

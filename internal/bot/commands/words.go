@@ -26,7 +26,7 @@ func (w Words) Run(s *discordgo.Session, i *discordgo.InteractionCreate) error {
 	var sb strings.Builder
 
 	for i, o := range words {
-		sb.WriteString(fmt.Sprintf("%d. %s — %d\n", i+1, o.Word, o.Total))
+		sb.WriteString(fmt.Sprintf("%d. **%s** → %d\n", i+1, o.Word, o.Total))
 	}
 
 	guild, _ := s.Guild(i.GuildID)
@@ -36,9 +36,15 @@ func (w Words) Run(s *discordgo.Session, i *discordgo.InteractionCreate) error {
 		Data: &discordgo.InteractionResponseData{
 			Embeds: []*discordgo.MessageEmbed{
 				{
-					Title:       fmt.Sprintf("Top words - %s", guild.Name),
+					Title:       fmt.Sprintf("Inspecting %s", guild.Name),
 					Description: sb.String(),
-					Color:       i.Member.User.AccentColor,
+					Fields: []*discordgo.MessageEmbedField{
+						{
+							Name:  "Top words",
+							Value: sb.String(),
+						},
+					},
+					Color: i.Member.User.AccentColor,
 				},
 			},
 		},

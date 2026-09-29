@@ -1,0 +1,16 @@
+services:
+  db:
+    image: docker.io/library/postgres:latest
+    container_name: nonobot-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nonobot
+      POSTGRES_PASSWORD: develop
+      POSTGRES_DB: nonodata
+    ports:
+      - "5432:5432"
+    volumes: 
+      - db-data:/var/lib/postgresql
+
+volumes:
+  db-data:

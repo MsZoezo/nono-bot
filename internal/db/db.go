@@ -3,6 +3,7 @@ package db
 
 import (
 	"context"
+	"time"
 
 	"github.com/MsZoezo/nono-bot/internal/db/models"
 	"gorm.io/driver/postgres"
@@ -25,7 +26,7 @@ func New() (*Database, error) {
 		return nil, err
 	}
 
-	if err := db.AutoMigrate(&models.NonoCount{}); err != nil {
+	if err := db.AutoMigrate(&models.NonoCount{}, &models.NonoEvent{}); err != nil {
 		return nil, err
 	}
 
@@ -47,6 +48,19 @@ func (database *Database) UpsertNonoWord(guildID string, userID string, word str
 			"count": gorm.Expr("nono_counts.count + ?", row.Count),
 		}),
 	}).Create(&row).Error
+}
+
+// CreateNonoEvent creates a new nono event record.
+func (database *Database) CreateNonoEvent(guildID string, userID string, word string) error {
+	row := models.NonoEvent{
+		GuildID: guildID,
+		UserID:  userID,
+		Word:    word,
+
+		Timestamp: time.Now(),
+	}
+
+	return database.db.Create(&row).Error
 }
 
 // OffenderStat is the data returned when we select the top offenders.
@@ -75,6 +89,13 @@ type WordStat struct {
 	Total uint64 `gorm:"column:total"`
 }
 
+// EventStat is the data returned when we select the latest events.
+type EventStat struct {
+	Word      string    `gorm:"column:word"`
+	UserID    string    `gorm:"column:user_id"`
+	Timestamp time.Time `gorm:"column:timestamp"`
+}
+
 // GetTopWordsGuild returns the top words for a given guild.
 func (database *Database) GetTopWordsGuild(guildID string) ([]WordStat, error) {
 	var results []WordStat
@@ -90,15 +111,28 @@ func (database *Database) GetTopWordsGuild(guildID string) ([]WordStat, error) {
 	return results, err
 }
 
-// GetUserWords returns nono words said by a user
-func (database *Database) GetUserWords(userID string) ([]WordStat, error) {
-	var results []WordStat
+// GetUserInfo returns nono word counts and events said by a user
+func (database *Database) GetUserInfo(userID string, guildID string) ([]WordStat, []EventStat, error) {
+	var words []WordStat
+	var events []EventStat
 
 	err := gorm.G[models.NonoCount](database.db).
 		Select("word, count AS total").
 		Where("user_id = ?", userID).
 		Order("total DESC").
-		Scan(ctx, &results)
+		Scan(ctx, &words)
 
-	return results, err
+	if err != nil {
+		return nil, nil, err
+	}
+
+	err = gorm.G[models.NonoEvent](database.db).
+		Select("word, user_id, timestamp").
+		Where("user_id = ?", userID).
+		Where("guild_id = ?", guildID).
+		Order("timestamp DESC").
+		Limit(10).
+		Scan(ctx, &events)
+
+	return words, events, err
 }

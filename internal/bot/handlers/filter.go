@@ -74,6 +74,7 @@ func (filter *Filter) Handler(s *discordgo.Session, m *discordgo.MessageCreate) 
 
 	for word, count := range found {
 		go filter.db.UpsertNonoWord(m.GuildID, m.Author.ID, word, count)
+		go filter.db.CreateNonoEvent(m.GuildID, m.Author.ID, word)
 	}
 
 	log.Debug("Filtered out bad words!", "user", m.Author.DisplayName(), "Elapsed (ms)", elapsed.Milliseconds(), "words", found)
